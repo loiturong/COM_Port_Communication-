@@ -74,7 +74,7 @@ partial class Form1
         // _BanWidth_box
         // 
         _BanWidth_box.FormattingEnabled = true;
-        _BanWidth_box.Items.AddRange(new object[] { "9700", "19200", "38400", "57600", "115200" });
+        _BanWidth_box.Items.AddRange(new object[] { "9600", "19200", "38400", "57600", "115200" });
         _BanWidth_box.Location = new System.Drawing.Point(170, 60);
         _BanWidth_box.Name = "_BanWidth_box";
         _BanWidth_box.Size = new System.Drawing.Size(88, 23);
@@ -97,6 +97,7 @@ partial class Form1
         _CLOSE_Port.TabIndex = 5;
         _CLOSE_Port.Text = "CLOSE";
         _CLOSE_Port.UseVisualStyleBackColor = true;
+        _CLOSE_Port.Enabled = false;
         // 
         // _StatusBar
         // 
@@ -105,6 +106,7 @@ partial class Form1
         _StatusBar.Name = "_StatusBar";
         _StatusBar.Size = new System.Drawing.Size(100, 23);
         _StatusBar.TabIndex = 1;
+        _StatusBar.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
         // 
         // _Transmiter
         // 
@@ -124,6 +126,7 @@ partial class Form1
         _Transmiter_Content.Name = "_Transmiter_Content";
         _Transmiter_Content.Size = new System.Drawing.Size(160, 120);
         _Transmiter_Content.TabIndex = 5;
+        _Transmiter_Content.Enabled = false;
         // 
         // _SEND_Button
         // 
@@ -133,6 +136,7 @@ partial class Form1
         _SEND_Button.TabIndex = 6;
         _SEND_Button.Text = "SEND";
         _SEND_Button.UseVisualStyleBackColor = true;
+        _SEND_Button.Enabled = false;
         // 
         // _Reciever
         // 
@@ -152,6 +156,7 @@ partial class Form1
         _Receiver_Content.Name = "_Receiver_Content";
         _Receiver_Content.Size = new System.Drawing.Size(160, 150);
         _Receiver_Content.TabIndex = 6;
+        _Receiver_Content.Enabled = false;
         // 
         // Form1
         // 
