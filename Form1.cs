@@ -156,7 +156,7 @@ public partial class Form1 : Form
             if (!data.Contains("_RATS_RAST_RAST")) return;
             // Handle run and stop
             var n = data.Length;
-            switch (data[n -1])
+            switch (data[(n - 1) / 2])
             {
                 case '7': _toggle_run_LED(true);
                     break;
