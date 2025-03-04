@@ -12,15 +12,12 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 public partial class Form1 : Form
 {
-    private SerialPort _serialPort;
-    private System.Windows.Forms.Timer _Timer;
+    private readonly SerialPort _serialPort;
     
     public Form1()
     {
         _serialPort = new SerialPort();
         _serialPort.ReadTimeout = 1000;
-        _Timer = new System.Windows.Forms.Timer();
-        _Timer.Interval = 2000; // Interval in milliseconds (200 miliseconds)
         
         // Initialize form
         InitializeComponent();
@@ -29,8 +26,7 @@ public partial class Form1 : Form
         GetComPortAvailable();
         
         // get data
-        _Timer.Tick += Timer_Tick;
-        _Timer.Start(); // Start the timer
+        _serialPort.DataReceived += _SerialPort_DataReceive;
         
         // Setup button
         _OPEN_Port.Click += Open_button_Click;
@@ -40,14 +36,14 @@ public partial class Form1 : Form
 
     private void GetComPortAvailable()
     {
-        String[] Port_names = SerialPort.GetPortNames();
+        String[] portNames = SerialPort.GetPortNames();
         
         // Push COM ports available to box:
         _COM_Port_box.Items.Clear();
-        _COM_Port_box.Items.AddRange(Port_names);
+        _COM_Port_box.Items.AddRange(portNames);
     }
 
-    private void Open_button_Click(object sender, EventArgs e)
+    private void Open_button_Click(object? sender, EventArgs e)
     {
         try
         {
@@ -77,7 +73,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void _Close_button_click(object sender, EventArgs e)
+    private void _Close_button_click(object? sender, EventArgs e)
     {
         _serialPort.Close();
         
@@ -96,46 +92,49 @@ public partial class Form1 : Form
         GetComPortAvailable();
     }
 
-    private void _SEND_Button_Click(object sender, EventArgs e)
+    private void _SEND_Button_Click(object? sender, EventArgs e)
     {
         _serialPort.WriteLine(_Transmiter_Content.Text);
         _Transmiter_Content.Text = "";
     }
-    
-    private void Timer_Tick(object sender, EventArgs e)
-    {
-        // Read data 
-        if (_serialPort.IsOpen)
-        {
-            // Read data
-            try
-            {
-                _Receiver_Content.Text = _serialPort.ReadLine();
-            }
-            catch (TimeoutException)
-            {
-                _Receiver_Content.Text = "Timeout Exception.";
-            }
-            catch (InvalidOperationException)
-            {
-                // Handle case where port is closed or invalid
-                _Receiver_Content.Text = "Port is closed or invalid";
-            }
-            catch (IOException)
-            {
-                // Handle I/O errors (like disconnected device)
-                _Receiver_Content.Text = "Communication error - device may be disconnected";
-            }
 
-        }
-        else ;
-    }
-    
-    // Close timer when the form is downed
-    protected override void OnFormClosing(FormClosingEventArgs e)
+    private void _SerialPort_DataReceive(object sender, SerialDataReceivedEventArgs e)
     {
-        _Timer.Stop();
-        _Timer.Dispose();
-        base.OnFormClosing(e);
+        void UpdateText(string text)
+        {
+            // Invoke(new Action(() => {
+            //     _Receiver_Content.Text = text;
+            // }));
+
+            if (_Receiver_Content.InvokeRequired)
+            {
+                _Receiver_Content.Invoke((MethodInvoker)(() => _Receiver_Content.Text = text));
+            }
+            else
+            {
+                _Receiver_Content.Text = text; // Already on UI thread (unlikely in this case)
+            }
+        }
+        
+        try
+        {
+            var data = _serialPort.ReadLine();
+
+            UpdateText(data);
+        }
+        catch (TimeoutException)
+        {
+            UpdateText("Receive Timeout");
+        }
+        catch (InvalidOperationException)
+        {
+            // Handle case where port is closed or invalid
+            UpdateText("Port is closed or invalid");
+        }
+        catch (IOException)
+        {
+            // Handle I/O errors (like disconnected device)
+            UpdateText("Communication error - device may be disconnected");
+        }
     }
 }

@@ -41,6 +41,7 @@ partial class Form1
         _SEND_Button = new System.Windows.Forms.Button();
         _Reciever = new System.Windows.Forms.GroupBox();
         _Receiver_Content = new System.Windows.Forms.TextBox();
+        _Controller = new System.Windows.Forms.GroupBox();
         _Transmiter.SuspendLayout();
         _Reciever.SuspendLayout();
         SuspendLayout();
@@ -91,19 +92,19 @@ partial class Form1
         // 
         // _CLOSE_Port
         // 
+        _CLOSE_Port.Enabled = false;
         _CLOSE_Port.Location = new System.Drawing.Point(310, 56);
         _CLOSE_Port.Name = "_CLOSE_Port";
         _CLOSE_Port.Size = new System.Drawing.Size(100, 30);
         _CLOSE_Port.TabIndex = 5;
         _CLOSE_Port.Text = "CLOSE";
         _CLOSE_Port.UseVisualStyleBackColor = true;
-        _CLOSE_Port.Enabled = false;
         // 
         // _StatusBar
         // 
         _StatusBar.Location = new System.Drawing.Point(500, 25);
-        _StatusBar.ReadOnly = true;
         _StatusBar.Name = "_StatusBar";
+        _StatusBar.ReadOnly = true;
         _StatusBar.Size = new System.Drawing.Size(100, 23);
         _StatusBar.TabIndex = 1;
         _StatusBar.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -121,22 +122,22 @@ partial class Form1
         // 
         // _Transmiter_Content
         // 
+        _Transmiter_Content.Enabled = false;
         _Transmiter_Content.Location = new System.Drawing.Point(10, 30);
         _Transmiter_Content.Multiline = true;
         _Transmiter_Content.Name = "_Transmiter_Content";
         _Transmiter_Content.Size = new System.Drawing.Size(160, 120);
         _Transmiter_Content.TabIndex = 5;
-        _Transmiter_Content.Enabled = false;
         // 
         // _SEND_Button
         // 
+        _SEND_Button.Enabled = false;
         _SEND_Button.Location = new System.Drawing.Point(10, 156);
         _SEND_Button.Name = "_SEND_Button";
         _SEND_Button.Size = new System.Drawing.Size(160, 30);
         _SEND_Button.TabIndex = 6;
         _SEND_Button.Text = "SEND";
         _SEND_Button.UseVisualStyleBackColor = true;
-        _SEND_Button.Enabled = false;
         // 
         // _Reciever
         // 
@@ -150,17 +151,29 @@ partial class Form1
         // 
         // _Receiver_Content
         // 
+        _Receiver_Content.Enabled = false;
         _Receiver_Content.Location = new System.Drawing.Point(10, 30);
-        _Receiver_Content.ReadOnly = true;
         _Receiver_Content.Multiline = true;
         _Receiver_Content.Name = "_Receiver_Content";
+        _Receiver_Content.ReadOnly = true;
         _Receiver_Content.Size = new System.Drawing.Size(160, 150);
         _Receiver_Content.TabIndex = 6;
-        _Receiver_Content.Enabled = false;
+        // 
+        // _Controller
+        // 
+        _Controller.BackColor = System.Drawing.SystemColors.Control;
+        _Controller.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+        _Controller.Location = new System.Drawing.Point(30, 375);
+        _Controller.Name = "_Controller";
+        _Controller.Size = new System.Drawing.Size(466, 123);
+        _Controller.TabIndex = 6;
+        _Controller.TabStop = false;
+        _Controller.Text = "Monotoring and controlling";
         // 
         // Form1
         // 
-        ClientSize = new System.Drawing.Size(625, 386);
+        ClientSize = new System.Drawing.Size(625, 509);
+        Controls.Add(_Controller);
         Controls.Add(_COMPortLabel);
         Controls.Add(_COM_Port_box);
         Controls.Add(_BanWidth);
@@ -178,6 +191,8 @@ partial class Form1
         ResumeLayout(false);
         PerformLayout();
     }
+
+    private System.Windows.Forms.GroupBox _Controller;
 
     private System.Windows.Forms.TextBox _Receiver_Content;
     private System.Windows.Forms.GroupBox _Reciever;
