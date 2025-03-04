@@ -42,8 +42,20 @@ partial class Form1
         _Reciever = new System.Windows.Forms.GroupBox();
         _Receiver_Content = new System.Windows.Forms.TextBox();
         _Controller = new System.Windows.Forms.GroupBox();
+        _LED_Stop = new System.Windows.Forms.Panel();
+        _LED_Run = new System.Windows.Forms.Panel();
+        _RUN_3 = new System.Windows.Forms.Button();
+        _RUN_2 = new System.Windows.Forms.Button();
+        _RUN_1 = new System.Windows.Forms.Button();
+        _STOP_3 = new System.Windows.Forms.Button();
+        _STOP_2 = new System.Windows.Forms.Button();
+        _STOP_1 = new System.Windows.Forms.Button();
+        _K3 = new System.Windows.Forms.Label();
+        _K2 = new System.Windows.Forms.Label();
+        _K1 = new System.Windows.Forms.Label();
         _Transmiter.SuspendLayout();
         _Reciever.SuspendLayout();
+        _Controller.SuspendLayout();
         SuspendLayout();
         // 
         // _COMPortLabel
@@ -102,7 +114,7 @@ partial class Form1
         // 
         // _StatusBar
         // 
-        _StatusBar.Location = new System.Drawing.Point(500, 25);
+        _StatusBar.Location = new System.Drawing.Point(450, 30);
         _StatusBar.Name = "_StatusBar";
         _StatusBar.ReadOnly = true;
         _StatusBar.Size = new System.Drawing.Size(100, 23);
@@ -163,6 +175,17 @@ partial class Form1
         // 
         _Controller.BackColor = System.Drawing.SystemColors.Control;
         _Controller.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+        _Controller.Controls.Add(_LED_Stop);
+        _Controller.Controls.Add(_LED_Run);
+        _Controller.Controls.Add(_RUN_3);
+        _Controller.Controls.Add(_RUN_2);
+        _Controller.Controls.Add(_RUN_1);
+        _Controller.Controls.Add(_STOP_3);
+        _Controller.Controls.Add(_STOP_2);
+        _Controller.Controls.Add(_STOP_1);
+        _Controller.Controls.Add(_K3);
+        _Controller.Controls.Add(_K2);
+        _Controller.Controls.Add(_K1);
         _Controller.Location = new System.Drawing.Point(30, 375);
         _Controller.Name = "_Controller";
         _Controller.Size = new System.Drawing.Size(466, 123);
@@ -170,9 +193,112 @@ partial class Form1
         _Controller.TabStop = false;
         _Controller.Text = "Monotoring and controlling";
         // 
+        // _LED_Stop
+        // 
+        _LED_Stop.Location = new System.Drawing.Point(406, 66);
+        _LED_Stop.Name = "_LED_Stop";
+        _LED_Stop.Size = new System.Drawing.Size(43, 35);
+        _LED_Stop.TabIndex = 2;
+        _LED_Stop.BackColor = _stopledOffColor;
+        // 
+        // _LED_Run
+        // 
+        _LED_Run.Location = new System.Drawing.Point(406, 25);
+        _LED_Run.Name = "_LED_Run";
+        _LED_Run.Size = new System.Drawing.Size(43, 35);
+        _LED_Run.TabIndex = 2;
+        _LED_Run.BackColor = _runledOffColor;
+        // 
+        // _RUN_3
+        // 
+        _RUN_3.Enabled = false;
+        _RUN_3.Location = new System.Drawing.Point(275, 60);
+        _RUN_3.Name = "_RUN_3";
+        _RUN_3.Size = new System.Drawing.Size(50, 25);
+        _RUN_3.TabIndex = 1;
+        _RUN_3.Text = "RUN";
+        _RUN_3.UseVisualStyleBackColor = true;
+        // 
+        // _RUN_2
+        // 
+        _RUN_2.Enabled = false;
+        _RUN_2.Location = new System.Drawing.Point(150, 60);
+        _RUN_2.Name = "_RUN_2";
+        _RUN_2.Size = new System.Drawing.Size(50, 25);
+        _RUN_2.TabIndex = 1;
+        _RUN_2.Text = "RUN";
+        _RUN_2.UseVisualStyleBackColor = true;
+        // 
+        // _RUN_1
+        // 
+        _RUN_1.Enabled = false;
+        _RUN_1.Location = new System.Drawing.Point(25, 60);
+        _RUN_1.Name = "_RUN_1";
+        _RUN_1.Size = new System.Drawing.Size(50, 25);
+        _RUN_1.TabIndex = 1;
+        _RUN_1.Text = "RUN";
+        _RUN_1.UseVisualStyleBackColor = true;
+        // 
+        // _STOP_3
+        // 
+        _STOP_3.Enabled = false;
+        _STOP_3.Location = new System.Drawing.Point(331, 60);
+        _STOP_3.Name = "_STOP_3";
+        _STOP_3.Size = new System.Drawing.Size(50, 25);
+        _STOP_3.TabIndex = 1;
+        _STOP_3.Text = "STOP";
+        _STOP_3.UseVisualStyleBackColor = true;
+        // 
+        // _STOP_2
+        // 
+        _STOP_2.Enabled = false;
+        _STOP_2.Location = new System.Drawing.Point(206, 60);
+        _STOP_2.Name = "_STOP_2";
+        _STOP_2.Size = new System.Drawing.Size(50, 25);
+        _STOP_2.TabIndex = 1;
+        _STOP_2.Text = "STOP";
+        _STOP_2.UseVisualStyleBackColor = true;
+        // 
+        // _STOP_1
+        // 
+        _STOP_1.Enabled = false;
+        _STOP_1.Location = new System.Drawing.Point(81, 60);
+        _STOP_1.Name = "_STOP_1";
+        _STOP_1.Size = new System.Drawing.Size(50, 25);
+        _STOP_1.TabIndex = 1;
+        _STOP_1.Text = "STOP";
+        _STOP_1.UseVisualStyleBackColor = true;
+        // 
+        // _K3
+        // 
+        _K3.BackColor = System.Drawing.SystemColors.Info;
+        _K3.Location = new System.Drawing.Point(270, 35);
+        _K3.Name = "_K3";
+        _K3.Size = new System.Drawing.Size(119, 60);
+        _K3.TabIndex = 0;
+        _K3.Text = "K3";
+        // 
+        // _K2
+        // 
+        _K2.BackColor = System.Drawing.SystemColors.Info;
+        _K2.Location = new System.Drawing.Point(145, 35);
+        _K2.Name = "_K2";
+        _K2.Size = new System.Drawing.Size(119, 60);
+        _K2.TabIndex = 0;
+        _K2.Text = "K2";
+        // 
+        // _K1
+        // 
+        _K1.BackColor = System.Drawing.SystemColors.Info;
+        _K1.Location = new System.Drawing.Point(20, 35);
+        _K1.Name = "_K1";
+        _K1.Size = new System.Drawing.Size(119, 60);
+        _K1.TabIndex = 0;
+        _K1.Text = "K1";
+        // 
         // Form1
         // 
-        ClientSize = new System.Drawing.Size(625, 509);
+        ClientSize = new System.Drawing.Size(577, 509);
         Controls.Add(_Controller);
         Controls.Add(_COMPortLabel);
         Controls.Add(_COM_Port_box);
@@ -188,9 +314,26 @@ partial class Form1
         _Transmiter.PerformLayout();
         _Reciever.ResumeLayout(false);
         _Reciever.PerformLayout();
+        _Controller.ResumeLayout(false);
         ResumeLayout(false);
         PerformLayout();
     }
+
+    private System.Windows.Forms.Panel _LED_Run;
+
+    private System.Windows.Forms.Panel _LED_Stop;
+
+    private System.Windows.Forms.Label _K2;
+    private System.Windows.Forms.Button _STOP_2;
+    private System.Windows.Forms.Button _RUN_2;
+    
+    private System.Windows.Forms.Label _K3;
+    private System.Windows.Forms.Button _STOP_3;
+    private System.Windows.Forms.Button _RUN_3;
+
+    private System.Windows.Forms.Button _STOP_1;
+    private System.Windows.Forms.Button _RUN_1;
+    private System.Windows.Forms.Label _K1;
 
     private System.Windows.Forms.GroupBox _Controller;
 
