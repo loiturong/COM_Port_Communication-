@@ -33,19 +33,20 @@ public partial class Form1 : Form
         GetComPortAvailable();
         
         // get data
-        _serialPort.DataReceived += _SerialPort_DataReceive;
+        // _serialPort.DataReceived += _SerialPort_DataReceive;
+        _serialPort.DataReceived += _ModifiedRead;
         
         // Setup button
         _OPEN_Port.Click += Open_button_Click;
         _CLOSE_Port.Click += _Close_button_click;
         _SEND_Button.Click += _SEND_Button_Click;
         
-        _RUN_1.Click += _Run_K1_Click;
-        _RUN_2.Click += _Run_K2_Click;
-        _RUN_3.Click += _Run_K3_Click;
-        _STOP_1.Click += _Stop_K1_Click;
-        _STOP_2.Click += _Stop_K2_Click;
-        _STOP_3.Click += _Stop_K3_Click;
+        // _RUN_1.Click += _Run_K1_Click;
+        // _RUN_2.Click += _Run_K2_Click;
+        // _RUN_3.Click += _Run_K3_Click;
+        // _STOP_1.Click += _Stop_K1_Click;
+        // _STOP_2.Click += _Stop_K2_Click;
+        // _STOP_3.Click += _Stop_K3_Click;
     }
 
     private void GetComPortAvailable()
@@ -123,7 +124,7 @@ public partial class Form1 : Form
         _serialPort.WriteLine(_Transmiter_Content.Text);
         _Transmiter_Content.Text = "";
     }
-
+    
     private void _SerialPort_DataReceive(object sender, SerialDataReceivedEventArgs e)
     {
         try
@@ -201,5 +202,35 @@ public partial class Form1 : Form
     private void _Stop_K3_Click(object? sender, EventArgs e)
     {
         _serialPort.WriteLine("STAR_STAR_STAR_6_RATS_RAST_RAST");
+    }
+
+    private void _ModifiedRead(object sender, SerialDataReceivedEventArgs e)
+    {
+        try
+        {
+            var data = _serialPort.ReadLine();
+            var n = data.Length;
+            // Handle first and last
+            string first_mapped = (Convert.ToInt32(data[0]) - 47).ToString();
+            string last_mapped = (Convert.ToInt32(data[n - 1]) - 47).ToString();
+            if (first_mapped == "10") first_mapped = "1";
+            if (last_mapped == "10") last_mapped = "1";
+            
+            _Receiver_Content.Text = first_mapped + data.Substring(1, n - 2) + last_mapped;
+        }
+        catch (TimeoutException)
+        {
+            _Receiver_Content.Text = "Receive Timeout";
+        }
+        catch (InvalidOperationException)
+        {
+            // Handle case where port is closed or invalid
+            _Receiver_Content.Text = "Port is closed or invalid";
+        }
+        catch (IOException)
+        {
+            // Handle I/O errors (like disconnected device)
+            _Receiver_Content.Text = "Communication error - device may be disconnected";
+        }
     }
 }
