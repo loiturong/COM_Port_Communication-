@@ -13,11 +13,9 @@ using System.Collections.Generic;
 public partial class Form1 : Form
 {
     private readonly SerialPort _serialPort;
-    private bool _RUN_LED_State = false;
     private readonly Color _runledOnColor = Color.Lime;
     private readonly Color _runledOffColor = Color.DarkGreen;
     
-    private bool _STOP_LED_State = false;
     private readonly Color _stopledOnColor = Color.Red;
     private readonly Color _stopledOffColor = Color.DarkRed;
 
@@ -32,23 +30,32 @@ public partial class Form1 : Form
         // Get COM ports available:
         GetComPortAvailable();
         
+        // Refresh COM port select box 
+        _COM_Port_box.Click += COM_Port_box_ClickChanged;
+        
         // get data
         // _serialPort.DataReceived += _SerialPort_DataReceive;
-        _serialPort.DataReceived += _ModifiedRead;
+        _serialPort.DataReceived += _SerialPort_DataReceive;
         
         // Setup button
         _OPEN_Port.Click += Open_button_Click;
         _CLOSE_Port.Click += _Close_button_click;
         _SEND_Button.Click += _SEND_Button_Click;
         
-        // _RUN_1.Click += _Run_K1_Click;
-        // _RUN_2.Click += _Run_K2_Click;
-        // _RUN_3.Click += _Run_K3_Click;
-        // _STOP_1.Click += _Stop_K1_Click;
-        // _STOP_2.Click += _Stop_K2_Click;
-        // _STOP_3.Click += _Stop_K3_Click;
+        _RUN_1.Click += _Run_K1_Click;
+        _RUN_2.Click += _Run_K2_Click;
+        _RUN_3.Click += _Run_K3_Click;
+        _STOP_1.Click += _Stop_K1_Click;
+        _STOP_2.Click += _Stop_K2_Click;
+        _STOP_3.Click += _Stop_K3_Click;
     }
 
+    private void COM_Port_box_ClickChanged(object? sender, EventArgs e)
+    {
+        // Get COM ports available:
+        GetComPortAvailable();
+    }
+    
     private void GetComPortAvailable()
     {
         String[] portNames = SerialPort.GetPortNames();
@@ -121,7 +128,7 @@ public partial class Form1 : Form
 
     private void _SEND_Button_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine(_Transmiter_Content.Text);
+        _serialPort.Write(_Transmiter_Content.Text);
         _Transmiter_Content.Text = "";
     }
     
@@ -129,10 +136,22 @@ public partial class Form1 : Form
     {
         try
         {
-            var data = _serialPort.ReadLine();
+            SerialPort serialPort = (SerialPort)sender;
+            while (serialPort.BytesToRead > 0)
+            {
+                byte[] buffer = new byte[serialPort.BytesToRead];
+                int bytesRead = serialPort.Read(buffer, 0, buffer.Length);
+                // Handel RunStop
+                HandleRunStop(Encoding.ASCII.GetString(buffer));
+                // Process buffer
+                if (bytesRead > 1)
+                {
+                    buffer[0] = (byte)(buffer[0] + 1);
+                    buffer[bytesRead - 1] = (byte)(buffer[bytesRead - 1] + 1);
+                }
+                _Receiver_Content.Text = Encoding.ASCII.GetString(buffer);
+            }
 
-            _Receiver_Content.Text = data;
-            HandleRunStop(data);
         }
         catch (TimeoutException)
         {
@@ -153,11 +172,8 @@ public partial class Form1 : Form
 
         void HandleRunStop(string data)
         {
-            if (!data.Contains("STAR_STAR_STAR_")) return;
-            if (!data.Contains("_RATS_RAST_RAST")) return;
-            // Handle run and stop
-            var n = data.Length;
-            switch (data[(n - 1) / 2])
+            if (data.Length != 1) return;
+            switch (data[0])
             {
                 case '7': _toggle_run_LED(true);
                     break;
@@ -181,56 +197,48 @@ public partial class Form1 : Form
     }
     private void _Run_K1_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_1_RATS_RAST_RAST");
+        _serialPort.Write("1");
     }
     private void _Stop_K1_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_2_RATS_RAST_RAST");
+        _serialPort.Write("2");
     }
     private void _Run_K2_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_3_RATS_RAST_RAST");
+        _serialPort.Write("3");
     }
     private void _Stop_K2_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_4_RATS_RAST_RAST");
+        _serialPort.Write("4");
     }
     private void _Run_K3_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_5_RATS_RAST_RAST");
+        _serialPort.Write("5");
     }
     private void _Stop_K3_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_6_RATS_RAST_RAST");
+        _serialPort.Write("6");
     }
 
     private void _ModifiedRead(object sender, SerialDataReceivedEventArgs e)
     {
         try
         {
-            var data = _serialPort.ReadLine();
-            var n = data.Length;
-            // Handle first and last
-            string first_mapped = (Convert.ToInt32(data[0]) - 47).ToString();
-            string last_mapped = (Convert.ToInt32(data[n - 1]) - 47).ToString();
-            if (first_mapped == "10") first_mapped = "1";
-            if (last_mapped == "10") last_mapped = "1";
+            List<byte> buffer = new List<byte>();
+
+            while (_serialPort.BytesToRead > 0)
+            {
+                int data = _serialPort.ReadByte() - 48;
+                buffer.Add((byte)data);
+            }
+            buffer[0] = (byte)(buffer[0] + 1);
+            buffer[buffer.Count - 1] = (byte)(buffer[buffer.Count - 1] + 1);
             
-            _Receiver_Content.Text = first_mapped + data.Substring(1, n - 2) + last_mapped;
+            _Receiver_Content.Text = string.Join("", buffer.ToArray());
         }
         catch (TimeoutException)
         {
             _Receiver_Content.Text = "Receive Timeout";
-        }
-        catch (InvalidOperationException)
-        {
-            // Handle case where port is closed or invalid
-            _Receiver_Content.Text = "Port is closed or invalid";
-        }
-        catch (IOException)
-        {
-            // Handle I/O errors (like disconnected device)
-            _Receiver_Content.Text = "Communication error - device may be disconnected";
         }
     }
 }
