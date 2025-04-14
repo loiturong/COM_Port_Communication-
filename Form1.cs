@@ -13,11 +13,9 @@ using System.Collections.Generic;
 public partial class Form1 : Form
 {
     private readonly SerialPort _serialPort;
-    private bool _RUN_LED_State = false;
     private readonly Color _runledOnColor = Color.Lime;
     private readonly Color _runledOffColor = Color.DarkGreen;
     
-    private bool _STOP_LED_State = false;
     private readonly Color _stopledOnColor = Color.Red;
     private readonly Color _stopledOffColor = Color.DarkRed;
 
@@ -32,8 +30,15 @@ public partial class Form1 : Form
         // Get COM ports available:
         GetComPortAvailable();
         
+        // Refresh COM port select box 
+        _COM_Port_box.Click += COM_Port_box_ClickChanged;
+        
         // get data
+        // 1a/
+        // _serialPort.DataReceived += _ModifiedRead;
+        // 1b/
         _serialPort.DataReceived += _SerialPort_DataReceive;
+        
         
         // Setup button
         _OPEN_Port.Click += Open_button_Click;
@@ -48,6 +53,12 @@ public partial class Form1 : Form
         _STOP_3.Click += _Stop_K3_Click;
     }
 
+    private void COM_Port_box_ClickChanged(object? sender, EventArgs e)
+    {
+        // Get COM ports available:
+        GetComPortAvailable();
+    }
+    
     private void GetComPortAvailable()
     {
         String[] portNames = SerialPort.GetPortNames();
@@ -69,6 +80,10 @@ public partial class Form1 : Form
             {
                 _serialPort.PortName = _COM_Port_box.Text;
                 _serialPort.BaudRate = Convert.ToInt32(_BanWidth_box.Text);
+                // matching stm32 configuration
+                _serialPort.DataBits = 8;
+                _serialPort.StopBits = StopBits.One;
+                _serialPort.Parity = Parity.None;
                 _serialPort.Open();
                 
                 // Push status
@@ -120,18 +135,22 @@ public partial class Form1 : Form
 
     private void _SEND_Button_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine(_Transmiter_Content.Text);
+        _serialPort.Write(_Transmiter_Content.Text);
         _Transmiter_Content.Text = "";
     }
-
+    
     private void _SerialPort_DataReceive(object sender, SerialDataReceivedEventArgs e)
     {
         try
         {
-            var data = _serialPort.ReadLine();
-
-            _Receiver_Content.Text = data;
-            HandleRunStop(data);
+            char[] receivedByte = new Char[2]; 
+            _serialPort.Read(receivedByte, 0, 2);
+            string receivedString = new string(receivedByte);
+            _Receiver_Content.Text = receivedString;
+            
+            // Handel RunStop
+            HandleRunStop(receivedString[0]);
+            HandleRunStop(receivedString[1]);
         }
         catch (TimeoutException)
         {
@@ -150,13 +169,9 @@ public partial class Form1 : Form
 
         return;
 
-        void HandleRunStop(string data)
+        void HandleRunStop(char data)
         {
-            if (!data.Contains("STAR_STAR_STAR_")) return;
-            if (!data.Contains("_RATS_RAST_RAST")) return;
-            // Handle run and stop
-            var n = data.Length;
-            switch (data[(n - 1) / 2])
+            switch (data)
             {
                 case '7': _toggle_run_LED(true);
                     break;
@@ -180,26 +195,50 @@ public partial class Form1 : Form
     }
     private void _Run_K1_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_1_RATS_RAST_RAST");
+        _serialPort.Write("1");
     }
     private void _Stop_K1_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_2_RATS_RAST_RAST");
+        _serialPort.Write("2");
     }
     private void _Run_K2_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_3_RATS_RAST_RAST");
+        _serialPort.Write("3");
     }
     private void _Stop_K2_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_4_RATS_RAST_RAST");
+        _serialPort.Write("4");
     }
     private void _Run_K3_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_5_RATS_RAST_RAST");
+        _serialPort.Write("5");
     }
     private void _Stop_K3_Click(object? sender, EventArgs e)
     {
-        _serialPort.WriteLine("STAR_STAR_STAR_6_RATS_RAST_RAST");
+        _serialPort.Write("6");
+    }
+
+    private void _ModifiedRead(object sender, SerialDataReceivedEventArgs e)
+    {
+        try
+        {
+            List<byte> buffer = new List<byte>();
+        
+            while (_serialPort.BytesToRead > 0)
+            {
+                int data = _serialPort.ReadByte() - 48;
+                buffer.Add((byte)data);
+            }
+
+            int n = buffer.Count;
+            buffer[0] = (byte)(buffer[0] + 1);
+            buffer[n - 1] = (byte)(buffer[n - 1] + 1);
+            
+            _Receiver_Content.Text = string.Join("", buffer.ToArray());
+        }
+        catch (TimeoutException)
+        {
+            _Receiver_Content.Text = "Receive Timeout";
+        }
     }
 }
