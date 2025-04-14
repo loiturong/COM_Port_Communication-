@@ -34,8 +34,11 @@ public partial class Form1 : Form
         _COM_Port_box.Click += COM_Port_box_ClickChanged;
         
         // get data
-        // _serialPort.DataReceived += _SerialPort_DataReceive;
+        // 1a/
+        // _serialPort.DataReceived += _ModifiedRead;
+        // 1b/
         _serialPort.DataReceived += _SerialPort_DataReceive;
+        
         
         // Setup button
         _OPEN_Port.Click += Open_button_Click;
@@ -77,6 +80,10 @@ public partial class Form1 : Form
             {
                 _serialPort.PortName = _COM_Port_box.Text;
                 _serialPort.BaudRate = Convert.ToInt32(_BanWidth_box.Text);
+                // matching stm32 configuration
+                _serialPort.DataBits = 8;
+                _serialPort.StopBits = StopBits.One;
+                _serialPort.Parity = Parity.None;
                 _serialPort.Open();
                 
                 // Push status
@@ -136,22 +143,14 @@ public partial class Form1 : Form
     {
         try
         {
-            SerialPort serialPort = (SerialPort)sender;
-            while (serialPort.BytesToRead > 0)
-            {
-                byte[] buffer = new byte[serialPort.BytesToRead];
-                int bytesRead = serialPort.Read(buffer, 0, buffer.Length);
-                // Handel RunStop
-                HandleRunStop(Encoding.ASCII.GetString(buffer));
-                // Process buffer
-                if (bytesRead > 1)
-                {
-                    buffer[0] = (byte)(buffer[0] + 1);
-                    buffer[bytesRead - 1] = (byte)(buffer[bytesRead - 1] + 1);
-                }
-                _Receiver_Content.Text = Encoding.ASCII.GetString(buffer);
-            }
-
+            char[] receivedByte = new Char[2]; 
+            _serialPort.Read(receivedByte, 0, 2);
+            string receivedString = new string(receivedByte);
+            _Receiver_Content.Text = receivedString;
+            
+            // Handel RunStop
+            HandleRunStop(receivedString[0]);
+            HandleRunStop(receivedString[1]);
         }
         catch (TimeoutException)
         {
@@ -170,10 +169,9 @@ public partial class Form1 : Form
 
         return;
 
-        void HandleRunStop(string data)
+        void HandleRunStop(char data)
         {
-            if (data.Length != 1) return;
-            switch (data[0])
+            switch (data)
             {
                 case '7': _toggle_run_LED(true);
                     break;
@@ -225,14 +223,16 @@ public partial class Form1 : Form
         try
         {
             List<byte> buffer = new List<byte>();
-
+        
             while (_serialPort.BytesToRead > 0)
             {
                 int data = _serialPort.ReadByte() - 48;
                 buffer.Add((byte)data);
             }
+
+            int n = buffer.Count;
             buffer[0] = (byte)(buffer[0] + 1);
-            buffer[buffer.Count - 1] = (byte)(buffer[buffer.Count - 1] + 1);
+            buffer[n - 1] = (byte)(buffer[n - 1] + 1);
             
             _Receiver_Content.Text = string.Join("", buffer.ToArray());
         }
